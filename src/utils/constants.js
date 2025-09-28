@@ -22,7 +22,7 @@ export const RECITER_NAMES = {
 
 // Translation options
 export const TRANSLATIONS = {
-  'en.sahih': 'English Translation',
+  'en.custom': 'English (Custom)',
   'ur.jalandhry': 'اردو ترجمہ',
   'tafsir': 'التفسير'
 };
@@ -31,7 +31,7 @@ export const TRANSLATIONS = {
 export const DEFAULT_RECITER = 'ar.alafasy';
 
 // Default translation
-export const DEFAULT_TRANSLATION = 'en.sahih';
+export const DEFAULT_TRANSLATION = 'en.custom';
 
 // CSS classes
 export const CSS_CLASSES = {

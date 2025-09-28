@@ -1,6 +1,14 @@
 import { API_BASE, AUDIO_BASE, RECITER_MAPPINGS } from '../utils/constants';
 
 class QuranAPI {
+  // Store custom English translation
+  static customEnglishTranslation = null;
+
+  // Set custom English translation data
+  static setCustomEnglishTranslation(translationData) {
+    this.customEnglishTranslation = translationData;
+  }
+
   // Fetch all Surahs
   static async getSurahs() {
     try {
@@ -33,9 +41,40 @@ class QuranAPI {
     }
   }
 
+  // Get custom English translation for a specific Surah
+  static getCustomEnglishTranslation(surahNumber) {
+    if (!this.customEnglishTranslation || !this.customEnglishTranslation[surahNumber.toString()]) {
+      throw new Error('Custom translation not available for this surah');
+    }
+
+    const surahData = this.customEnglishTranslation[surahNumber.toString()];
+    
+    // Convert to API format
+    const ayahs = surahData.verses.map((verse, index) => ({
+      number: index + 1,
+      numberInSurah: index + 1,
+      text: verse,
+      surah: {
+        number: surahNumber,
+        name: surahData.name
+      }
+    }));
+
+    return {
+      number: surahNumber,
+      name: surahData.name,
+      ayahs: ayahs
+    };
+  }
+
   // Fetch translation for a specific Surah
   static async getTranslation(surahNumber, translationId) {
     try {
+      // Use custom English translation if requested
+      if (translationId === 'en.custom') {
+        return this.getCustomEnglishTranslation(surahNumber);
+      }
+
       let translationUrl;
       
       if (translationId === 'tafsir') {
@@ -65,13 +104,14 @@ class QuranAPI {
     }
   }
 
-  // Search in Quran
+  // Search in Quran (including custom translation)
   static async searchQuran(query) {
     try {
       if (query.length < 2) {
         return { matches: [] };
       }
 
+      // Search in Arabic text
       const response = await fetch(`${API_BASE}/search/${encodeURIComponent(query)}/all/ar`);
       const data = await response.json();
       
@@ -83,6 +123,36 @@ class QuranAPI {
       console.error('Error searching Quran:', error);
       throw error;
     }
+  }
+
+  // Search in custom English translation
+  static searchCustomEnglishTranslation(query) {
+    if (!this.customEnglishTranslation || query.length < 2) {
+      return { matches: [] };
+    }
+
+    const matches = [];
+    const lowercaseQuery = query.toLowerCase();
+
+    Object.keys(this.customEnglishTranslation).forEach(surahNumber => {
+      const surahData = this.customEnglishTranslation[surahNumber];
+      
+      surahData.verses.forEach((verse, index) => {
+        if (verse.toLowerCase().includes(lowercaseQuery)) {
+          matches.push({
+            number: index + 1,
+            numberInSurah: index + 1,
+            text: verse,
+            surah: {
+              number: parseInt(surahNumber),
+              name: surahData.name
+            }
+          });
+        }
+      });
+    });
+
+    return { matches: matches.slice(0, 10) }; // Return top 10 matches
   }
 
   // Get audio URL for a specific verse

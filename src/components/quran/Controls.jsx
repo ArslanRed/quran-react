@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDebounce } from '../../hooks';
-import { QuranAPI } from '../../services';
+import QuranAPI from '../../services/quranApi';
 import { RECITER_NAMES, TRANSLATIONS } from '../../utils/constants';
 
 const Controls = ({ 
@@ -158,8 +158,11 @@ const Controls = ({
                       className="search-result"
                       onClick={() => handleSearchResultClick(result)}
                     >
-                      <strong>سورة {result.surah.name} ({result.numberInSurah})</strong><br />
-                      <span className="arabic-text" style={{ fontSize: '1rem' }}>
+                      <strong>
+                        سورة {result.surah.name} ({result.numberInSurah})
+                        {result.isCustomTranslation && <span style={{ color: '#666', fontSize: '0.8rem' }}> - English</span>}
+                      </strong><br />
+                      <span className={result.isCustomTranslation ? '' : 'arabic-text'} style={{ fontSize: '1rem' }}>
                         {result.text}
                       </span>
                     </div>
@@ -186,15 +189,16 @@ const Controls = ({
           <label>الترجمة</label>
           <div className="translation-toggle">
             {Object.entries(TRANSLATIONS).map(([id, name]) => (
-              <button
-                key={id}
-                className={`toggle-btn ${currentTranslation === id ? 'active' : ''}`}
-                onClick={() => handleTranslationToggle(id)}
-              >
-                {id === 'en.sahih' ? 'English' : 
-                 id === 'ur.jalandhry' ? 'اردو' : 'تفسير'}
-              </button>
-            ))}
+  <button
+    key={id}
+    className={`toggle-btn ${currentTranslation === id ? 'active' : ''}`}
+    onClick={() => handleTranslationToggle(id)}
+  >
+    {id === 'en.custom' ? 'English' : 
+     id === 'ur.jalandhry' ? 'اردو' : 'تفسير'}
+  </button>
+))}
+
           </div>
         </div>
       </div>

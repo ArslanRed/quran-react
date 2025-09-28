@@ -56,12 +56,10 @@ body {
     gap: 10px;
     font-size: 1.5rem;
     font-weight: 600;
+    
 }
 
-.logo::before {
-    content: "📖";
-    font-size: 2rem;
-}
+
 
 .nav-buttons {
     display: flex;

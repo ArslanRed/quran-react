@@ -7,6 +7,9 @@ import { NaatPage } from './components/naat';
 import { Notification } from './components/common';
 import './styles/globals.css';
 
+// Import your custom translation data
+import customTranslationData from './data/customTranslation.json'; // You'll need to create this file
+
 function App() {
   const [currentPage, setCurrentPage] = useState('quran');
   const [notification, setNotification] = useState({ message: '', type: '', show: false });
@@ -27,7 +30,10 @@ function App() {
       <Header currentPage={currentPage} onPageChange={showPage} />
       
       {currentPage === 'quran' && (
-        <QuranPage showNotification={showNotification} />
+        <QuranPage 
+          showNotification={showNotification} 
+          customTranslationData={customTranslationData}
+        />
       )}
       {currentPage === 'bookmarks' && (
         <BookmarksPage showNotification={showNotification} />
